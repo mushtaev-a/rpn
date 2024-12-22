@@ -51,7 +51,7 @@ PORT=3000 ./calculator
 Once the server is running, you can verify it's working:
 
 ```bash
-curl -X POST http://localhost:8080/ \
+curl -X POST http://localhost:8080/api/v1/calculate \
   -H "Content-Type: application/json" \
   -d '{"expression": "2+2"}'
 ```
@@ -118,7 +118,7 @@ The calculator is available as an HTTP service. By default, it runs on port 8080
 ### HTTP Endpoint
 
 ```
-POST http://localhost:8080/
+POST http://localhost:8080/api/v1/calculate
 Content-Type: application/json
 ```
 
@@ -135,7 +135,7 @@ Content-Type: application/json
 Calculate a simple expression:
 
 ```bash
-curl -X POST http://localhost:8080/ \
+curl -X POST http://localhost:8080/api/v1/calculate \
   -H "Content-Type: application/json" \
   -d '{"expression": "2+2*3"}'
 
@@ -145,7 +145,7 @@ curl -X POST http://localhost:8080/ \
 Calculate with parentheses:
 
 ```bash
-curl -X POST http://localhost:8080/ \
+curl -X POST http://localhost:8080/api/v1/calculate \
   -H "Content-Type: application/json" \
   -d '{"expression": "(2+2)*3"}'
 
@@ -164,14 +164,14 @@ Error response examples:
 
 ```bash
 # Empty expression
-curl -X POST http://localhost:8080/ \
+curl -X POST http://localhost:8080/api/v1/calculate \
   -H "Content-Type: application/json" \
   -d '{"expression": ""}'
 
 # Response: Empty expression
 
 # Invalid operation
-curl -X POST http://localhost:8080/ \
+curl -X POST http://localhost:8080/api/v1/calculate \
   -H "Content-Type: application/json" \
   -d '{"expression": "2++2"}'
 
