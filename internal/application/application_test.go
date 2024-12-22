@@ -52,21 +52,21 @@ func TestHandleCalculator(t *testing.T) {
 			name:           "invalid expression",
 			method:         http.MethodPost,
 			body:           map[string]string{"expression": "2++2"},
-			expectedStatus: http.StatusBadRequest,
+			expectedStatus: http.StatusUnprocessableEntity,
 			expectError:    true,
 		},
 		{
 			name:           "invalid parentheses",
 			method:         http.MethodPost,
 			body:           map[string]string{"expression": "(2+2"},
-			expectedStatus: http.StatusBadRequest,
+			expectedStatus: http.StatusUnprocessableEntity,
 			expectError:    true,
 		},
 		{
 			name:           "division by zero",
 			method:         http.MethodPost,
 			body:           map[string]string{"expression": "1/0"},
-			expectedStatus: http.StatusBadRequest,
+			expectedStatus: http.StatusUnprocessableEntity,
 			expectError:    true,
 		},
 	}
@@ -76,9 +76,9 @@ func TestHandleCalculator(t *testing.T) {
 			var req *http.Request
 			if tc.body != nil {
 				bodyBytes, _ := json.Marshal(tc.body)
-				req = httptest.NewRequest(tc.method, "/", bytes.NewBuffer(bodyBytes))
+				req = httptest.NewRequest(tc.method, "/api/v1/calculate", bytes.NewBuffer(bodyBytes))
 			} else {
-				req = httptest.NewRequest(tc.method, "/", nil)
+				req = httptest.NewRequest(tc.method, "/api/v1/calculate", nil)
 			}
 
 			rr := httptest.NewRecorder()
