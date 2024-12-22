@@ -156,8 +156,9 @@ curl -X POST http://localhost:8080/api/v1/calculate \
 
 The API returns the following status codes:
 
-- 400 Bad Request: Invalid expressions, division by zero, etc.
+- 400 Bad Request: Invalid JSON or empty expression.
 - 405 Method Not Allowed: When using non-POST methods
+- 422 Unprocessable Entity: Invalid expressions, division by zero, etc.
 - 500 Internal Server Error: Unexpected errors
 
 Error response examples:
