@@ -36,7 +36,7 @@ func New() *Application {
 	}
 }
 
-var BadRequestErrors []error = []error{
+var UnprocessableRequestErrors []error = []error{
 	rpn.ErrDividingByZero,
 	rpn.ErrDuplicateOpertaionsSigns,
 	rpn.ErrOpertaionsSigns,
@@ -50,17 +50,23 @@ func HandleCalculation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Method not allowed"})
 		return
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
-		http.Error(w, "Invalid JSON request body", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Invalid JSON request body"})
 		return
 	}
 
 	if reqBody.Expression == "" {
-		http.Error(w, "Empty expression", http.StatusBadRequest)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"error": "Empty expression"})
 		return
 	}
 
@@ -68,16 +74,19 @@ func HandleCalculation(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		statusCode := http.StatusInternalServerError
+		w.Header().Set("Content-Type", "application/json")
 
-		for _, e := range BadRequestErrors {
+		for _, e := range UnprocessableRequestErrors {
 			if errors.Is(err, e) {
-				statusCode = http.StatusBadRequest
-				http.Error(w, err.Error(), statusCode)
+				statusCode = http.StatusUnprocessableEntity
+				w.WriteHeader(statusCode)
+				json.NewEncoder(w).Encode(map[string]string{"error": "Expression is not valid"})
 				return
 			}
 		}
 
-		http.Error(w, err.Error(), statusCode)
+		w.WriteHeader(statusCode)
+		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 		return
 	}
 
@@ -88,7 +97,7 @@ func HandleCalculation(w http.ResponseWriter, r *http.Request) {
 func (a *Application) Run() {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", HandleCalculation)
+	mux.HandleFunc("/api/v1/calculate", HandleCalculation)
 
 	log.Printf("Server is running on :%s port", a.config.Port)
 
