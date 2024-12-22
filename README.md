@@ -6,6 +6,56 @@ A mathematical expression calculator implementation in Go that supports standard
 
 This calculator implements basic arithmetic operations using standard mathematical notation. It supports both simple expressions and complex expressions with parentheses.
 
+## Getting Started
+
+### Prerequisites
+
+- Go 1.16 or later
+- Git
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/mushtaev-a/rpn.git
+cd rpn
+
+# Build the application
+go build -o calculator cmd/main.go
+```
+
+### Running the Server
+
+You can run the server in two ways:
+
+1. Using the built binary:
+
+```bash
+./calculator
+```
+
+2. Using go run:
+
+```bash
+go run cmd/main.go
+```
+
+The server will start on port 8080 by default. You can change the port by setting the PORT environment variable:
+
+```bash
+PORT=3000 ./calculator
+```
+
+### Health Check
+
+Once the server is running, you can verify it's working:
+
+```bash
+curl -X POST http://localhost:8080/ \
+  -H "Content-Type: application/json" \
+  -d '{"expression": "2+2"}'
+```
+
 ## Supported Operations
 
 - Addition (+)
@@ -60,3 +110,70 @@ The package includes comprehensive test cases covering:
 - Complex expressions with multiple operators
 - Parentheses handling
 - Error cases
+
+## API Usage
+
+The calculator is available as an HTTP service. By default, it runs on port 8080 (configurable via PORT environment variable).
+
+### HTTP Endpoint
+
+```
+POST http://localhost:8080/
+Content-Type: application/json
+```
+
+### Request Format
+
+```json
+{
+  "expression": "your_expression_here"
+}
+```
+
+### Example Curl Commands
+
+Calculate a simple expression:
+
+```bash
+curl -X POST http://localhost:8080/ \
+  -H "Content-Type: application/json" \
+  -d '{"expression": "2+2*3"}'
+
+# Response: {"result":8}
+```
+
+Calculate with parentheses:
+
+```bash
+curl -X POST http://localhost:8080/ \
+  -H "Content-Type: application/json" \
+  -d '{"expression": "(2+2)*3"}'
+
+# Response: {"result":12}
+```
+
+### Error Responses
+
+The API returns the following status codes:
+
+- 400 Bad Request: Invalid expressions, division by zero, etc.
+- 405 Method Not Allowed: When using non-POST methods
+- 500 Internal Server Error: Unexpected errors
+
+Error response examples:
+
+```bash
+# Empty expression
+curl -X POST http://localhost:8080/ \
+  -H "Content-Type: application/json" \
+  -d '{"expression": ""}'
+
+# Response: Empty expression
+
+# Invalid operation
+curl -X POST http://localhost:8080/ \
+  -H "Content-Type: application/json" \
+  -d '{"expression": "2++2"}'
+
+# Response: some of operations are dublicated
+```
